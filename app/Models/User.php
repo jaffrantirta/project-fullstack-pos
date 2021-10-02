@@ -11,7 +11,16 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, Notifiable;
+    use HasApiTokens, Notifiable, HasFactory;
+    public $timestamps = true;
+    public function role()
+    {
+        return $this->hasOne(Role::class, 'id', 'role_id');
+    }
+    public function shop_user()
+    {
+        return $this->belongsTo(Shop_user::class, 'user_id', 'id');
+    }
 
     /**
      * The attributes that are mass assignable.

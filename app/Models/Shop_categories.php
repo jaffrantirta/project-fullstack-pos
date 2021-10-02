@@ -5,12 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Role extends Model
+class Shop_categories extends Model
 {
     use HasFactory;
     public $timestamps = true;
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'role_id', 'id');
-    }
 }

@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Shop_user;
 use Illuminate\Support\Facades\Auth;
+use App\Util\ResponseJson;
 use Validator;
 
 class UserController extends Controller
@@ -15,11 +17,26 @@ class UserController extends Controller
     public function login(){
         if(Auth::attempt(['email' => request('email'), 'password' => request('password')])){
             $user = Auth::user();
-            $success['token'] =  $user->createToken('nApp')->accessToken;
-            return response()->json(['success' => $success], $this->successStatus);
+            $user_detail = User::with('role')->find($user->id);
+            $shop_detail = Shop_user::with('shop')->where('user_id', $user->id)->get();
+            $data = array(
+                'indonesia' => 'Login Berhasil',
+                'english' => 'You are logged in',
+                'data' => array(
+                    'user' => $user_detail,
+                    'shop' => $shop_detail,
+                    'token' => $user->createToken('nApp')->accessToken
+                )
+            );
+            return response()->json(ResponseJson::response($data), 200);
         }
         else{
-            return response()->json(['error'=>'Unauthorised'], 401);
+            $data = array(
+                'status' => false,
+                'indonesia' => 'Login Gagal',
+                'english' => 'Failed to Login'
+            );
+            return response()->json(ResponseJson::response($data), 401);
         }
     }
 
@@ -42,7 +59,7 @@ class UserController extends Controller
         $success['token'] =  $user->createToken('nApp')->accessToken;
         $success['name'] =  $user->name;
 
-        return response()->json(['success'=>$success], $this->successStatus);
+        return response()->json(['success'=>$success], 200);
     }
 
     public function logout(Request $request)
@@ -58,6 +75,6 @@ class UserController extends Controller
     public function details()
     {
         $user = Auth::user();
-        return response()->json(['success' => $user], $this->successStatus);
+        return response()->json(['success' => $user], 200);
     }
 }
