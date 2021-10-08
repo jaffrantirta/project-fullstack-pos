@@ -10,6 +10,8 @@ use App\Models\Shop_user;
 use App\Models\Shop_category_owneds;
 use App\Util\ResponseJson;
 use Validator;
+use App\Mail\Main;
+use Illuminate\Support\Facades\Mail;
 
 class ShopController extends Controller
 {
@@ -75,6 +77,13 @@ class ShopController extends Controller
 
             DB::commit();
             $data = array(
+                'name'=>$request->user_name,
+            );
+            Mail::send('email_template', ['user' => $data], function ($m) use ($user) {
+                $m->from('drivebali2016@gmail.com', 'POS');
+                $m->to($user->email, $user->name)->subject('Registration Success');
+            });
+            $data = array(
                 'indonesia' => 'Registrasi Berhasil, mohon untuk cek email anda untuk verifikasi akun',
                 'english' => 'You are registered now, please chack your email to verify your account'
             );
@@ -90,4 +99,17 @@ class ShopController extends Controller
             return response()->json(ResponseJson::response($data), 500);
         }
     }
+    public function send_email(){
+ 
+		// Mail::to("franartika@gmail.com")->send(new Main());
+        $users = User::all();
+        $user = $users->find(6);
+        Mail::send('email_template', ['user' => $user], function ($m) use ($user) {
+            $m->from('drivebali2016@gmail.com', 'POS');
+            $m->to($user->email, $user->name)->subject('Registration Success');
+        });
+      
+		return "Email telah dikirim";
+ 
+	}
 }

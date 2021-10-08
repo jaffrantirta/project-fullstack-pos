@@ -35,3 +35,4 @@ Route::post('shop_category/all', [ShopCategoriesController::class, 'show']);
 
 // Register Shop and Owner
 Route::post('register/shop', [ShopController::class, 'register']);
+Route::get('send_email', [ShopController::class, 'send_email']);

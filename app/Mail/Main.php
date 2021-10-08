@@ -28,11 +28,6 @@ class Main extends Mailable
      */
     public function build()
     {
-       return $this->from('Test')
-                   ->view('emailku')
-                   ->with(
-                    [
-                        'nama' => 'POS'
-                    ]);
+       return $this->from('drivebali2016@gmail.com', 'POS')->view('email_template')->with(['nama' => 'POS']);
     }
 }
