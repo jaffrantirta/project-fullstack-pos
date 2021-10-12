@@ -3,6 +3,8 @@
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ShopCategoriesController;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\GroupController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -27,6 +29,18 @@ Route::post('login', [UserController::class, 'login']);
 Route::group(['middleware' => 'auth:api'], function(){
     Route::get('user/detail', [UserController::class, 'details']);
     Route::post('logout', [UserController::class, 'logout']);
+
+    //category
+    Route::post('category/add', [CategoryController::class, 'store']);
+    Route::post('category/update/{id}', [CategoryController::class, 'update']);
+    Route::delete('category/delete/{id}', [CategoryController::class, 'destroy']);
+    Route::get('category',[CategoryController::class, 'index']);
+
+    //group
+    Route::post('group/add', [GroupController::class, 'store']);
+    Route::post('group/update/{id}', [GroupController::class, 'update']);
+    Route::delete('group/delete/{id}', [GroupController::class, 'destroy']);
+    Route::get('group',[GroupController::class, 'index']);
 }); 
 
 
@@ -34,5 +48,5 @@ Route::group(['middleware' => 'auth:api'], function(){
 Route::post('shop_category/all', [ShopCategoriesController::class, 'show']);
 
 // Register Shop and Owner
-Route::post('register/shop', [ShopController::class, 'register']);
+Route::post('shop/register', [ShopController::class, 'register']);
 Route::get('send_email', [ShopController::class, 'send_email']);

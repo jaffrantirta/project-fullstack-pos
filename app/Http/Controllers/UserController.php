@@ -19,16 +19,25 @@ class UserController extends Controller
             $user = Auth::user();
             $user_detail = User::with('role')->find($user->id);
             $shop_detail = Shop_user::with('shop')->where('user_id', $user->id)->get();
-            $data = array(
-                'indonesia' => 'Login Berhasil',
-                'english' => 'You are logged in',
-                'data' => array(
-                    'user' => $user_detail,
-                    'shop' => $shop_detail,
-                    'token' => $user->createToken('nApp')->accessToken
-                )
-            );
-            return response()->json(ResponseJson::response($data), 200);
+            if($shop_detail[0]['shop']->is_active){
+                $data = array(
+                    'indonesia' => 'Login Berhasil',
+                    'english' => 'You are logged in',
+                    'data' => array(
+                        'user' => $user_detail,
+                        'shop' => $shop_detail,
+                        'token' => $user->createToken('nApp')->accessToken
+                    )
+                );
+                return response()->json(ResponseJson::response($data), 200);
+            }else{
+                $data = array(
+                    'status' => false,
+                    'indonesia' => 'Akun Anda Belum Aktif',
+                    'english' => 'Your Account is not active'
+                );
+                return response()->json(ResponseJson::response($data), 401);
+            }
         }
         else{
             $data = array(
