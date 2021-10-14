@@ -76,7 +76,7 @@ class CategoryController extends Controller
                     $vCategory->save();
                     $file->move($path,$name);
 
-                    Log::create($shop, array('name'=>'category added', 'description'=>'category '.$request->name.' successful added by '.$user->name));
+                    Log::create($shop, array('name'=>'category added', 'description'=>'category '.(string) $vCategory.' successful added by '.$user->name));
 
                     DB::commit();
                         

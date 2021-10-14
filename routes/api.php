@@ -5,6 +5,7 @@ use App\Http\Controllers\ShopCategoriesController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\ProductCOntroller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -41,6 +42,12 @@ Route::group(['middleware' => 'auth:api'], function(){
     Route::post('group/update/{id}', [GroupController::class, 'update']);
     Route::delete('group/delete/{id}', [GroupController::class, 'destroy']);
     Route::get('group',[GroupController::class, 'index']);
+
+    //product
+    Route::post('product/add', [ProductCOntroller::class, 'store']);
+    Route::post('product/update/{id}', [ProductCOntroller::class, 'update']);
+    Route::delete('product/delete/{id}', [ProductCOntroller::class, 'destroy']);
+    Route::get('product',[ProductCOntroller::class, 'index']);
 }); 
 
 
