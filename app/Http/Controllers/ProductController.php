@@ -24,7 +24,23 @@ class ProductController extends Controller
      */
     public function index()
     {
-        //
+        $user = Auth::user();
+        $shop = Shop_user::with('shop')->where('user_id', $user->id)->get();
+        if(isset($_GET['id'])){
+            $id = $_GET['id'];
+            $product = array(
+                'detail'=>Product::find($id),
+                'pictures'=>Product_photo::where('product_id', $id)->get()
+            );
+            $data = array(
+                'indonesia' => 'Ditemukan',
+                'english' => 'Founded',
+                'data' => $product,
+            );
+            return response()->json(ResponseJson::response($data), 200);
+        }else{
+            return Datatables::of(Product::where('shop_id', $shop[0]->shop_id)->where('is_active', true)->get())->make(true);
+        }
     }
 
     /**
@@ -48,7 +64,18 @@ class ProductController extends Controller
         $user = Auth::user();
         $check = Checker::valid($request, array('name'=>'required', 'group_id' => 'required'));
         $shop = Shop_user::with('shop')->where('user_id', $user->id)->get();
-        if($check==null){
+        $ext = $request->file('file');
+        $ext_allowed = array();
+        $ext_disallowed = array();
+        foreach($ext as $x){
+            if($x->getClientOriginalExtension() == 'jpg' || $x->getClientOriginalExtension() == 'jpeg' || $x->getClientOriginalExtension() == 'png'){
+                $ext_allowed[] = $x->getClientOriginalExtension();
+            }else{
+                $ext_disallowed[] = $x->getClientOriginalExtension();
+            }
+        }
+        if(count($ext_allowed) == count($ext)){
+            if($check==null){
                 DB::beginTransaction();
                 try {
                     
@@ -109,25 +136,18 @@ class ProductController extends Controller
                     DB::rollback();
                     return $th;
                 }
-        }else{
-            return response()->json(ResponseJson::response($check), 401);
-        }
-    }
-    public function test(Request $request)
-    {
-        if ($files = $request->file('file')) {
-            $path = 'files/images/products/';
-            foreach($files as $file){
-                $data[] = $file->getClientOriginalName();
-                // $name = time().$file->getClientOriginalName();
-                // $vPhoto = new Product_photo();
-                // $vPhoto->product_id = $product_id;
-                // $vPhoto->picture = $path.$name;
-                // $vPhoto->save();
-                // $vPhoto->move($path,$name);
+            }else{
+                return response()->json(ResponseJson::response($check), 401);
             }
+        }else{
+            $data = array(
+                'status' => false,
+                'indonesia' => count($ext_disallowed).' Format Gambar Tidak sesuai. Gunakan Format Gambar JPG, JPEG atau PNG',
+                'english' => count($ext_disallowed).' Extension Picture are disallowed. Please Use Extension JPG, JPEG or PNG of the picture',
+                'data' => array('error_message'=>$ext_disallowed)
+            );
+            return response()->json(ResponseJson::response($data), 500);
         }
-        echo json_encode($data);
     }
 
     /**
@@ -159,9 +179,44 @@ class ProductController extends Controller
      * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Product $product)
+    public function update(Request $request, $id)
     {
-        //
+        $user = Auth::user();
+        $check = Checker::valid($request, array('name'=>'required', 'group_id' => 'required'));
+        $shop = Shop_user::with('shop')->where('user_id', $user->id)->get();
+            if($check==null){
+                DB::beginTransaction();
+                try {
+                    $old_product = Product::find($id);
+                    $update = Product::find($id)->update($request->all());
+                    $new_product = Product::find($id);
+
+                    Log::create($shop, array('name'=>'Product updated', 'description'=>'product '.(string) $old_product.' successful update to be '.(string) $new_product.' by '.$user->name));
+
+                    DB::commit();
+                        
+                    $data = array(
+                        'indonesia' => 'Produk Diperbaharui',
+                        'english' => 'Product Updated',
+                    );
+                    return response()->json(ResponseJson::response($data), 200);
+
+                } catch (\Exception $e) {
+                    DB::rollback();
+                    $data = array(
+                        'status' => false,
+                        'indonesia' => 'Gagal Memperbaharui Produk',
+                        'english' => 'Failed to Update Product',
+                        'data' => array('error_message'=>$e->errorInfo[2])
+                    );
+                    return response()->json(ResponseJson::response($data), 500);
+                } catch (\Throwable $th) {
+                    DB::rollback();
+                    return $th;
+                }
+            }else{
+                return response()->json(ResponseJson::response($check), 401);
+            }
     }
 
     /**
@@ -170,8 +225,34 @@ class ProductController extends Controller
      * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Product $product)
+    public function destroy($id)
     {
-        //
+        $user = Auth::user(); 
+        $shop = Shop_user::with('shop')->where('user_id', $user->id)->get();
+        DB::beginTransaction();
+        try {
+            $delete = Product::find($id);
+            $old_name = $delete;
+            $delete->delete();
+
+            Log::create($shop, array('name'=>'product deleted', 'description'=>'product '.(string) $old_name.' has been deleted by '.$user->name));
+
+            DB::commit();
+            $data = array(
+                'indonesia' => 'Produk Dihapus',
+                'english' => 'Product Deleted',
+            );
+            return response()->json(ResponseJson::response($data), 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            $data = array(
+                'status' => false,
+                'indonesia' => 'Produk Gagal Dihapus',
+                'english' => 'Product Failed to Delete',
+                'data' => array('error_message'=>$e->errorInfo[2])
+            );
+            return response()->json(ResponseJson::response($data), 500);
+
+        }
     }
 }
