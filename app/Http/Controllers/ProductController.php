@@ -9,6 +9,7 @@ use App\Util\Checker;
 use App\Util\Log;
 
 use App\Models\Product_photo;
+use App\Models\Product_tax;
 use App\Models\Shop_user;
 
 use Illuminate\Support\Facades\Auth;
@@ -30,7 +31,8 @@ class ProductController extends Controller
             $id = $_GET['id'];
             $product = array(
                 'detail'=>Product::find($id),
-                'pictures'=>Product_photo::where('product_id', $id)->get()
+                'pictures'=>Product_photo::where('product_id', $id)->get(),
+                'tax'=>Product_tax::where('product_id', $id)->get()
             );
             $data = array(
                 'indonesia' => 'Ditemukan',

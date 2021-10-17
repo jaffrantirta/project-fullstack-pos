@@ -5,7 +5,10 @@ use App\Http\Controllers\ShopCategoriesController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GroupController;
-use App\Http\Controllers\ProductCOntroller;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductVariantController;
+use App\Http\Controllers\ProductTaxController;
+use App\Http\Controllers\BuyerTypeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -48,6 +51,24 @@ Route::group(['middleware' => 'auth:api'], function(){
     Route::post('product/update/{id}', [ProductCOntroller::class, 'update']);
     Route::delete('product/delete/{id}', [ProductCOntroller::class, 'destroy']);
     Route::get('product',[ProductCOntroller::class, 'index']);
+
+    //product variant
+    Route::post('product_variant/add', [ProductVariantController::class, 'store']);
+    Route::post('product_variant/update/{id}', [ProductVariantController::class, 'update']);
+    Route::delete('product_variant/delete/{id}', [ProductVariantController::class, 'destroy']);
+    Route::get('product_variant',[ProductVariantController::class, 'index']);
+
+    //product tax
+    Route::post('product_tax/add', [ProductTaxController::class, 'store']);
+    Route::post('product_tax/update/{product_id}', [ProductTaxController::class, 'update']);
+    Route::delete('product_tax/delete/{product_id}', [ProductTaxController::class, 'destroy']);
+    Route::get('product_tax',[ProductTaxController::class, 'index']);
+
+    //buyer type
+    Route::post('buyer_type/add', [BuyerTypeController::class, 'store']);
+    Route::post('buyer_type/update/{product_id}', [BuyerTypeController::class, 'update']);
+    Route::delete('buyer_type/delete/{product_id}', [BuyerTypeController::class, 'destroy']);
+    Route::get('buyer_type',[BuyerTypeController::class, 'index']);
 }); 
 
 
