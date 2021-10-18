@@ -66,16 +66,22 @@ class ProductController extends Controller
         $user = Auth::user();
         $check = Checker::valid($request, array('name'=>'required', 'group_id' => 'required'));
         $shop = Shop_user::with('shop')->where('user_id', $user->id)->get();
-        $ext = $request->file('file');
-        $ext_allowed = array();
-        $ext_disallowed = array();
-        foreach($ext as $x){
-            if($x->getClientOriginalExtension() == 'jpg' || $x->getClientOriginalExtension() == 'jpeg' || $x->getClientOriginalExtension() == 'png'){
-                $ext_allowed[] = $x->getClientOriginalExtension();
-            }else{
-                $ext_disallowed[] = $x->getClientOriginalExtension();
+        if($files = $request->file('file')){
+            $ext = $request->file('file');
+            $ext_allowed = array();
+            $ext_disallowed = array();
+            foreach($ext as $x){
+                if($x->getClientOriginalExtension() == 'jpg' || $x->getClientOriginalExtension() == 'jpeg' || $x->getClientOriginalExtension() == 'png'){
+                    $ext_allowed[] = $x->getClientOriginalExtension();
+                }else{
+                    $ext_disallowed[] = $x->getClientOriginalExtension();
+                }
             }
+        }else{
+            $ext_allowed[] = true;
+            $ext[] = true;
         }
+        
         if(count($ext_allowed) == count($ext)){
             if($check==null){
                 DB::beginTransaction();
