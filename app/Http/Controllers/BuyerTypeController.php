@@ -24,7 +24,19 @@ class BuyerTypeController extends Controller
      */
     public function index()
     {
-        //
+        $user = Auth::user();
+        $shop = Shop_user::with('shop')->where('user_id', $user->id)->get();
+        if(isset($_GET['id'])){
+            $id = $_GET['id'];
+            $data = array(
+                'indonesia' => 'Ditemukan',
+                'english' => 'Founded',
+                'data' => Buyer_type::where('id', $id)->get(),
+            );
+            return response()->json(ResponseJson::response($data), 200);
+        }else{
+            return Datatables::of(Buyer_type::where('shop_id', $shop[0]->shop_id)->get())->make(true);
+        }
     }
 
     /**
@@ -110,9 +122,44 @@ class BuyerTypeController extends Controller
      * @param  \App\Models\Buyer_type  $buyer_type
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Buyer_type $buyer_type)
+    public function update(Request $request, $id)
     {
-        //
+        $user = Auth::user();
+        $check = Checker::valid($request, array('name' => 'required'));
+        $shop = Shop_user::with('shop')->where('user_id', $user->id)->get();
+        if($check==null){
+            DB::beginTransaction();
+            try {
+                $old = Buyer_type::where('id', $id)->get();
+                Buyer_type::where('id', $id)->update($request->all());
+                $new = Buyer_type::where('id', $id)->get();
+
+                Log::create($shop, array('name'=>'buyer type updated', 'description'=>'buyer type '.(string) $old .' has been updated to be '.(string) $new.' by '.$user->name));
+
+                DB::commit();
+
+                $data = array(
+                    'indonesia' => 'Tipe Pembeli Telah Diperbaharui',
+                    'english' => 'Buyer Type Updated',
+                );
+                return response()->json(ResponseJson::response($data), 200);
+
+            } catch (\Exception $e) {
+                DB::rollback();
+                $data = array(
+                    'status' => false,
+                    'indonesia' => 'Gagal Mengubah Tipe Pembeli',
+                    'english' => 'Failed to Update Buyer Type',
+                    'data' => array('error_message'=>$e->errorInfo[2])
+                );
+                return response()->json(ResponseJson::response($data), 500);
+            } catch (\Throwable $th) {
+                DB::rollback();
+                return $th;
+            }
+        }else{
+            return response()->json(ResponseJson::response($check), 401);
+        }
     }
 
     /**
@@ -121,8 +168,36 @@ class BuyerTypeController extends Controller
      * @param  \App\Models\Buyer_type  $buyer_type
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Buyer_type $buyer_type)
+    public function destroy($id)
     {
-        //
+        $user = Auth::user(); 
+        $shop = Shop_user::with('shop')->where('user_id', $user->id)->get();
+        DB::beginTransaction();
+        try {
+            $old = Buyer_type::where('id', $id)->get();
+            Buyer_type::where('id', $id)->delete();
+
+            Log::create($shop, array('name'=>'buyer type deleted', 'description'=>'buyer type '.(string) $old.' has been deleted by '.$user->name));
+
+            DB::commit();
+            $data = array(
+                'indonesia' => 'Tipe Pembeli Dihapus',
+                'english' => 'Buyer Type Deleted',
+            );
+            return response()->json(ResponseJson::response($data), 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            $data = array(
+                'status' => false,
+                'indonesia' => 'Tipe Pembeli Gagal Dihapus',
+                'english' => 'Buyer Type Failed to Delete',
+                'data' => array('error_message'=>$e->errorInfo[2])
+            );
+            return response()->json(ResponseJson::response($data), 500);
+
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return $th;
+        }
     }
 }
