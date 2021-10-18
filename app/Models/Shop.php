@@ -13,4 +13,8 @@ class Shop extends Model
     {
         return $this->belongsTo(Shop_user::class, 'shop_id', 'id');
     }
+    public function verify_shop()
+    {
+        return $this->belongsTo(Verify_shop::class, 'shop_id', 'id');
+    }
 }

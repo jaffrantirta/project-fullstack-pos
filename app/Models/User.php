@@ -9,9 +9,9 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, Notifiable, HasFactory;
+    use HasApiTokens, Notifiable, HasFactory, Notifiable;
     public $timestamps = true;
     public function role()
     {
@@ -48,9 +48,4 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-    // use HasFactory;
-    // public function roles()
-    // {
-    //     return $this->hasOne(Role::class, 'id', 'role_id');
-    // }
 }
