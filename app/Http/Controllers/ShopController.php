@@ -89,7 +89,7 @@ class ShopController extends Controller
                     'status' => false,
                     'indonesia' => 'Registrasi Gagal',
                     'english' => 'Your Registration is Failed',
-                    'data' => array('error_message'=>$e->errorInfo[2])
+                    'data' => array('error_message'=>$e)
                 );
                 return response()->json(ResponseJson::response($data), 500);
             } catch (\Throwable $th) {
