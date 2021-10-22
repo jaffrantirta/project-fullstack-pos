@@ -58,7 +58,6 @@ class ShopController extends Controller
                 $verify_shop->token = $token;
                 $verify_shop->save();
 
-                DB::commit();
                 $config = array(
                     'user_name'=>$request->user_name,
                     'email'=>$request->email,
@@ -82,6 +81,7 @@ class ShopController extends Controller
                     'indonesia' => 'Registrasi Berhasil, mohon untuk cek email anda untuk verifikasi akun',
                     'english' => 'You are registered now, please chack your email to verify your account'
                 );
+                DB::commit();
                 return response()->json(ResponseJson::response($data), 200);
             } catch (\Exception $e) {
                 DB::rollback();
