@@ -92,6 +92,9 @@ class ShopController extends Controller
                     'data' => array('error_message'=>$e->errorInfo[2])
                 );
                 return response()->json(ResponseJson::response($data), 500);
+            } catch (\Throwable $th) {
+                DB::rollback();
+                return $th;
             }
         }else{
             return response()->json(ResponseJson::response($check), 401);
