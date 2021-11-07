@@ -26,11 +26,11 @@ class ProductController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $shop = Shop_user::with('shop')->where('user_id', $user->id)->get();
+        $shop_id = Shop_user::with('shop')->where('user_id', $user->id)->first()->shop_id;
         if(isset($_GET['id'])){
             $id = $_GET['id'];
             $product = array(
-                'detail'=>Product::find($id),
+                'product'=>Product::find($id),
                 'pictures'=>Product_photo::where('product_id', $id)->get(),
                 'tax'=>Product_tax::where('product_id', $id)->get()
             );
@@ -41,7 +41,7 @@ class ProductController extends Controller
             );
             return response()->json(ResponseJson::response($data), 200);
         }else{
-            return Datatables::of(Product::where('shop_id', $shop[0]->shop_id)->where('is_active', true)->get())->make(true);
+            return Product::where('shop_id', $shop_id)->where('is_active', true)->paginate(5);
         }
     }
 

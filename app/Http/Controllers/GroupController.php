@@ -25,17 +25,17 @@ class GroupController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $shop = Shop_user::with('shop')->where('user_id', $user->id)->get();
+        $shop_id = Shop_user::where('user_id', $user->id)->first()->shop_id;
         if(isset($_GET['id'])){
             $id = $_GET['id'];
             $data = array(
                 'indonesia' => 'Ditemukan',
                 'english' => 'Founded',
-                'data' => Group::find($id)->get(),
+                'data' => Group::find($id),
             );
             return response()->json(ResponseJson::response($data), 200);
         }else{
-            return Datatables::of(Group::where('shop_id', $shop[0]->shop_id)->where('is_active', true)->get())->make(true);
+            return Group::where('shop_id', $shop_id)->where('is_active', true)->paginate(5);
         }
     }
 

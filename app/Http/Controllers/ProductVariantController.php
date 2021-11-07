@@ -25,7 +25,7 @@ class ProductVariantController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $shop = Shop_user::with('shop')->where('user_id', $user->id)->get();
+        $shop_id = Shop_user::where('user_id', $user->id)->first()->shop_id;
         if(isset($_GET['id'])){
             $id = $_GET['id'];
             $data = array(
@@ -39,11 +39,11 @@ class ProductVariantController extends Controller
             $data = array(
                 'indonesia' => 'Ditemukan',
                 'english' => 'Founded',
-                'data' => Product_variant::where('product_id', $product_id)->get(),
+                'data' => Product_variant::where('product_id', $product_id)->paginate(5),
             );
             return response()->json(ResponseJson::response($data), 200);
         }else{
-            return Datatables::of(Product_variant::all())->make(true);
+            return Product_variant::paginate(5);
         }
     }
 
