@@ -45,6 +45,7 @@ Route::group(['middleware' => 'auth:api'], function(){
     Route::post('group/update/{id}', [GroupController::class, 'update']);
     Route::delete('group/delete/{id}', [GroupController::class, 'destroy']);
     Route::get('group',[GroupController::class, 'index']);
+    Route::get('group/all',[GroupController::class, 'all_by_shop']);
 
     //product
     Route::post('product/add', [ProductCOntroller::class, 'store']);

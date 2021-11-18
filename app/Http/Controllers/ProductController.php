@@ -41,7 +41,14 @@ class ProductController extends Controller
             );
             return response()->json(ResponseJson::response($data), 200);
         }else{
-            return Product::where('shop_id', $shop_id)->where('is_active', true)->paginate(5);
+            return Product::where('products.shop_id', $shop_id)
+            ->join('groups', 'groups.id', '=', 'products.group_id')
+            ->leftJoin('product_photos', 'product_photos.product_id', '=', 'products.id')
+            ->select('groups.name as group_name', 'products.*', 'product_photos.picture')
+            ->groupBy('products.id')
+            ->where('products.is_active', true)
+            ->latest()
+            ->paginate(5);
         }
     }
 

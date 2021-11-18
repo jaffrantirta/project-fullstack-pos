@@ -34,6 +34,16 @@ class GroupController extends Controller
                 'data' => Group::where('id', $id)->with('category')->first(),
             );
             return response()->json(ResponseJson::response($data), 200);
+        }else if(isset($_GET['all'])){
+            if($_GET['all']){
+                return Group::where('shop_id', $shop_id)
+                ->join('categories', 'categories.id', '=', 'groups.category_id')
+                ->select('groups.*', 'categories.name as category_name')
+                ->where('groups.is_active', true)
+                ->get();
+            }else{
+                return response()->json(['404'], 404);
+            }
         }else{
             return Group::where('shop_id', $shop_id)
             ->join('categories', 'categories.id', '=', 'groups.category_id')
@@ -41,6 +51,12 @@ class GroupController extends Controller
             ->where('groups.is_active', true)
             ->paginate(5);
         }
+    }
+    public function all_by_shop()
+    {
+        $user = Auth::user();
+        $shop_id = Shop_user::where('user_id', $user->id)->first()->shop_id;
+        
     }
 
     /**
