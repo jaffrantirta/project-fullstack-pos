@@ -11,4 +11,8 @@ class Category extends Model
     protected $fillable = [
         'name', 'picture', 'shop_id'
     ];
+    public function group()
+    {
+        return $this->belongsTo(Group::class, 'category_id', 'id');
+    }
 }

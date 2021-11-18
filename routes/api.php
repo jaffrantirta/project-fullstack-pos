@@ -73,7 +73,7 @@ Route::group(['middleware' => 'auth:api'], function(){
 
 
 //Shop Categories
-Route::post('shop_category/all', [ShopCategoriesController::class, 'show']);
+Route::get('shop_category/all', [ShopCategoriesController::class, 'show']);
 
 // Register Shop and Owner
 Route::post('shop/register', [ShopController::class, 'register']);

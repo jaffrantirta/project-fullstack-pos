@@ -31,11 +31,15 @@ class GroupController extends Controller
             $data = array(
                 'indonesia' => 'Ditemukan',
                 'english' => 'Founded',
-                'data' => Group::find($id),
+                'data' => Group::where('id', $id)->with('category')->first(),
             );
             return response()->json(ResponseJson::response($data), 200);
         }else{
-            return Group::where('shop_id', $shop_id)->where('is_active', true)->paginate(5);
+            return Group::where('shop_id', $shop_id)
+            ->join('categories', 'categories.id', '=', 'groups.category_id')
+            ->select('groups.*', 'categories.name as category_name')
+            ->where('groups.is_active', true)
+            ->paginate(5);
         }
     }
 

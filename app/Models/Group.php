@@ -11,4 +11,8 @@ class Group extends Model
     protected $fillable = [
         'name', 'category_id', 'is_pos', 'is_active', 'shop_id'
     ];
+    public function category()
+    {
+        return $this->hasOne(Category::class, 'id', 'category_id');
+    }
 }

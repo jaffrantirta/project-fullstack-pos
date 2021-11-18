@@ -36,7 +36,7 @@ class CategoryController extends Controller
             );
             return response()->json(ResponseJson::response($data), 200);
         }else{
-            return Category::where('shop_id', $shop_id)->where('is_active', true)->paginate(5);
+            return Category::where('is_active', true)->get();
         }
     }
 
