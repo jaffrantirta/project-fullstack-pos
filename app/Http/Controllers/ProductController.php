@@ -9,6 +9,7 @@ use App\Util\Checker;
 use App\Util\Log;
 
 use App\Models\Product_photo;
+use App\Models\Product_variant;
 use App\Models\Product_tax;
 use App\Models\Shop_user;
 
@@ -29,17 +30,32 @@ class ProductController extends Controller
         $shop_id = Shop_user::with('shop')->where('user_id', $user->id)->first()->shop_id;
         if(isset($_GET['id'])){
             $id = $_GET['id'];
-            $product = array(
-                'product'=>Product::find($id),
-                'pictures'=>Product_photo::where('product_id', $id)->get(),
-                'tax'=>Product_tax::where('product_id', $id)->get()
-            );
-            $data = array(
-                'indonesia' => 'Ditemukan',
-                'english' => 'Founded',
-                'data' => $product,
-            );
-            return response()->json(ResponseJson::response($data), 200);
+            if($id == "null" || $id == "undefined"){
+                $data = array(
+                    'status' => false,
+                    'indonesia' => 'Tidak Ada Produk Ditemukan',
+                    'english' => 'No One Product Found',
+                );
+                return response()->json(ResponseJson::response($data), 404);
+            }else{
+                $product = array(
+                    'product'=>Product::where('products.id', $id)
+                    ->join('groups', 'groups.id', '=', 'products.group_id')
+                    ->leftJoin('product_photos', 'product_photos.product_id', '=', 'products.id')
+                    ->select('groups.name as group_name', 'products.*', 'product_photos.picture')
+                    ->groupBy('products.id')
+                    ->first(),
+                    'pictures'=>Product_photo::where('product_id', $id)->get(),
+                    'tax'=>Product_tax::where('product_id', $id)->first(),
+                    'variants'=>Product_variant::where('product_id', $id)->latest()->get(),
+                );
+                $data = array(
+                    'indonesia' => 'Ditemukan',
+                    'english' => 'Founded',
+                    'data' => $product,
+                );
+                return response()->json(ResponseJson::response($data), 200);
+            }
         }else{
             return Product::where('products.shop_id', $shop_id)
             ->join('groups', 'groups.id', '=', 'products.group_id')
