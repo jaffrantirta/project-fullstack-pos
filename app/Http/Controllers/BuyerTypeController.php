@@ -35,7 +35,7 @@ class BuyerTypeController extends Controller
             );
             return response()->json(ResponseJson::response($data), 200);
         }else{
-            return Buyer_type::where('shop_id', $shop_id)->paginate(5);
+            return Buyer_type::where('shop_id', $shop_id)->latest()->paginate(5);
         }
     }
 

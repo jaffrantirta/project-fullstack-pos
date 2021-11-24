@@ -7,6 +7,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductVariantController;
+use App\Http\Controllers\ProductPhotoController;
 use App\Http\Controllers\ProductTaxController;
 use App\Http\Controllers\BuyerTypeController;
 use Illuminate\Http\Request;
@@ -58,6 +59,12 @@ Route::group(['middleware' => 'auth:api'], function(){
     Route::post('product_variant/update/{id}', [ProductVariantController::class, 'update']);
     Route::delete('product_variant/delete/{id}', [ProductVariantController::class, 'destroy']);
     Route::get('product_variant',[ProductVariantController::class, 'index']);
+
+     //product photo
+     Route::post('product_photo/add', [ProductPhotoController::class, 'store']);
+     Route::post('product_photo/update/{id}', [ProductPhotoController::class, 'update']);
+     Route::delete('product_photo/delete/{id}', [ProductPhotoController::class, 'destroy']);
+     Route::get('product_photo',[ProductPhotoController::class, 'index']);
 
     //product tax
     Route::post('product_tax/add', [ProductTaxController::class, 'store']);
