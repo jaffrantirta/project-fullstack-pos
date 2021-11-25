@@ -12,7 +12,6 @@ use App\Util\Log;
 use App\Models\Shop_user;
 
 use Illuminate\Support\Facades\Auth;
-use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\DB;
 
 class BuyerTypeController extends Controller

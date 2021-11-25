@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Price_grade_product;
 use Illuminate\Http\Request;
 use App\Util\ResponseJson;
 use App\Util\Checker;
@@ -48,6 +49,7 @@ class ProductController extends Controller
                     'pictures'=>Product_photo::where('product_id', $id)->get(),
                     'tax'=>Product_tax::where('product_id', $id)->first(),
                     'variants'=>Product_variant::where('product_id', $id)->latest()->get(),
+                    'price_grade_products'=>Price_grade_product::where('product_id', $id)->latest()->get(),
                 );
                 $data = array(
                     'indonesia' => 'Ditemukan',

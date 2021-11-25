@@ -22,4 +22,8 @@ class Product extends Model
         'shop_id',
         'group_id'
     ];
+    public function price_grade_product()
+    {
+        return $this->hasOne(Price_grade_product::class, 'id', 'product_id');
+    }
 }
