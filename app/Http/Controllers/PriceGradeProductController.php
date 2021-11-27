@@ -60,7 +60,44 @@ class PriceGradeProductController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $user = Auth::user();
+        $check = Checker::valid($request, array('product_id'=>'required', 'buyer_type_id'=>'required', 'minimum_qty'=>'required', 'type'=>'required'));
+        $shop = Shop_user::with('shop')->where('user_id', $user->id)->get();
+        if($check==null){
+            DB::beginTransaction();
+            try {
+                $add = new Price_grade_product();
+                $add->buyer_type_id = $request->buyer_type_id;
+                $add->type = $request->type;
+                $add->selling_price = $request->selling_price;
+                $add->discount = $request->discount;
+                $add->product_obtained = $request->product_obtained ;
+                $add->product_id = $request->product_id;
+                $add->save();
+
+                Log::create($shop, array('name'=>'price grade product added', 'description'=>'price grade product '.(string) $add.' successful added by '.$user->name));
+
+                DB::commit();
+                        
+                $data = array(
+                    'indonesia' => 'Tingkatan Harga Ditambahkan',
+                    'english' => 'Price Grade Added',
+                );
+                return response()->json(ResponseJson::response($data), 200);
+
+            } catch (\Exception $e) {
+                DB::rollback();
+                $data = array(
+                    'status' => false,
+                    'indonesia' => 'Gagal Menambah Tingkatan Harga',
+                    'english' => 'Failed to Add Price Grade',
+                    'data' => array('error_message'=>$e->errorInfo[2])
+                );
+                return response()->json(ResponseJson::response($data), 500);
+            }
+        }else{
+            return response()->json(ResponseJson::response($check), 401);
+        }
     }
 
     /**

@@ -33,6 +33,13 @@ class BuyerTypeController extends Controller
                 'data' => Buyer_type::find($id),
             );
             return response()->json(ResponseJson::response($data), 200);
+        }else if(isset($_GET['all'])){
+            if($_GET['all']){
+                return Buyer_type::where('shop_id', $shop_id)
+                ->get();
+            }else{
+                return response()->json(['404'], 404);
+            }
         }else{
             return Buyer_type::where('shop_id', $shop_id)->latest()->paginate(5);
         }

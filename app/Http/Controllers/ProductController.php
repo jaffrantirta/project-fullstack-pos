@@ -58,6 +58,12 @@ class ProductController extends Controller
                 );
                 return response()->json(ResponseJson::response($data), 200);
             }
+        }else if(isset($_GET['all'])){
+            if($_GET['all']){
+                return Product::where('shop_id', $shop_id)->get();
+            }else{
+                return response()->json(['404'], 404);
+            }
         }else{
             return Product::where('products.shop_id', $shop_id)
             ->join('groups', 'groups.id', '=', 'products.group_id')

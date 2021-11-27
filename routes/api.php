@@ -10,6 +10,7 @@ use App\Http\Controllers\ProductVariantController;
 use App\Http\Controllers\ProductPhotoController;
 use App\Http\Controllers\ProductTaxController;
 use App\Http\Controllers\BuyerTypeController;
+use App\Http\Controllers\PriceGradeProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -77,6 +78,12 @@ Route::group(['middleware' => 'auth:api'], function(){
     Route::post('buyer_type/update/{product_id}', [BuyerTypeController::class, 'update']);
     Route::delete('buyer_type/delete/{product_id}', [BuyerTypeController::class, 'destroy']);
     Route::get('buyer_type',[BuyerTypeController::class, 'index']);
+
+    //price grade product
+    Route::post('price_grade_product/add', [PriceGradeProductController::class, 'store']);
+    Route::post('price_grade_product/update/{product_id}', [PriceGradeProductController::class, 'update']);
+    Route::delete('price_grade_product/delete/{product_id}', [PriceGradeProductController::class, 'destroy']);
+    Route::get('price_grade_product',[PriceGradeProductController::class, 'index']);
 }); 
 
 
