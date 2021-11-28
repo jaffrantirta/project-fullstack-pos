@@ -36,12 +36,26 @@ class ProductVariantController extends Controller
             return response()->json(ResponseJson::response($data), 200);
         }else if(isset($_GET['product_id'])){
             $product_id = $_GET['product_id'];
-            $data = array(
-                'indonesia' => 'Ditemukan',
-                'english' => 'Founded',
-                'data' => Product_variant::where('product_id', $product_id)->paginate(5),
-            );
-            return response()->json(ResponseJson::response($data), 200);
+            if(isset($_GET['all'])){
+                $all = $_GET['all'];
+                if($all){
+                    return Product_variant::where('product_id', $product_id)->get();
+                }else{
+                    $data = array(
+                        'status' => false,
+                        'indonesia' => 'Route Tidak Tersedia',
+                        'english' => 'Route not found'
+                    );
+                    return response()->json(ResponseJson::response($data), 404);
+                }
+            }else{
+                $data = array(
+                    'indonesia' => 'Ditemukan',
+                    'english' => 'Founded',
+                    'data' => Product_variant::where('product_id', $product_id)->paginate(5),
+                );
+                return response()->json(ResponseJson::response($data), 200);
+            }
         }else{
             return Product_variant::paginate(5);
         }

@@ -18,4 +18,8 @@ class Product_variant extends Model
         'is_empty',
         'is_notification_alert'
     ];
+    public function price_grade_product()
+    {
+        return $this->hasOne(Price_grade_product::class, 'id', 'product_id');
+    }
 }

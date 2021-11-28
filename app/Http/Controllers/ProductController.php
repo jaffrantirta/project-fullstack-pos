@@ -49,7 +49,12 @@ class ProductController extends Controller
                     'pictures'=>Product_photo::where('product_id', $id)->get(),
                     'tax'=>Product_tax::where('product_id', $id)->first(),
                     'variants'=>Product_variant::where('product_id', $id)->latest()->get(),
-                    'price_grade_products'=>Price_grade_product::where('product_id', $id)->latest()->get(),
+                    'price_grade_products'=>Price_grade_product::where('price_grade_products.product_id', $id)
+                    ->join('buyer_types', 'buyer_types.id', '=', 'price_grade_products.buyer_type_id')
+                    ->leftJoin('product_variants', 'product_variants.id', '=', 'price_grade_products.product_variant_id')
+                    ->select('price_grade_products.*', 'buyer_types.name as buyer_type_name', 'product_variants.name as product_variant_name')
+                    ->latest()
+                    ->get(),
                 );
                 $data = array(
                     'indonesia' => 'Ditemukan',
