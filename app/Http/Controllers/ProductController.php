@@ -15,7 +15,6 @@ use App\Models\Product_tax;
 use App\Models\Shop_user;
 
 use Illuminate\Support\Facades\Auth;
-use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
