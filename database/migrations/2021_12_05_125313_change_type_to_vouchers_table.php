@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddProductIdAgain2ToPriceGradeProductsTable extends Migration
+class ChangeTypeToVouchersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,9 @@ class AddProductIdAgain2ToPriceGradeProductsTable extends Migration
      */
     public function up()
     {
-        Schema::table('price_grade_products', function (Blueprint $table) {
-            $table->bigInteger('product_variant_id')->unsigned()->nullable()->change();
+        Schema::table('vouchers', function (Blueprint $table) {
+            $table->string('voucher_code', 20);
+            $table->integer('type')->comment('1=price_value, 2=percentage')->change();
         });
     }
 
@@ -25,7 +26,7 @@ class AddProductIdAgain2ToPriceGradeProductsTable extends Migration
      */
     public function down()
     {
-        Schema::table('price_grade_products', function (Blueprint $table) {
+        Schema::table('vouchers', function (Blueprint $table) {
             //
         });
     }

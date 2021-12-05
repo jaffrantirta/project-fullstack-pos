@@ -12,6 +12,8 @@ use App\Http\Controllers\ProductTaxController;
 use App\Http\Controllers\BuyerTypeController;
 use App\Http\Controllers\PriceGradeProductController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentMethodController;
+use App\Http\Controllers\VoucherController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -86,8 +88,23 @@ Route::group(['middleware' => 'auth:api'], function(){
     Route::delete('price_grade_product/delete/{product_id}', [PriceGradeProductController::class, 'destroy']);
     Route::get('price_grade_product',[PriceGradeProductController::class, 'index']);
 
+    //payment method
+    Route::post('payment_method/add', [PaymentMethodController::class, 'store']);
+    Route::post('payment_method/update/{product_id}', [PaymentMethodController::class, 'update']);
+    Route::delete('payment_method/delete/{product_id}', [PaymentMethodController::class, 'destroy']);
+    Route::get('payment_method',[PaymentMethodController::class, 'index']);
+
+    //voucher
+    Route::post('voucher/add', [VoucherController::class, 'store']);
+    Route::post('voucher/update/{product_id}', [VoucherController::class, 'update']);
+    Route::delete('voucher/delete/{product_id}', [VoucherController::class, 'destroy']);
+    Route::get('voucher',[VoucherController::class, 'index']);
+
     //cart
     Route::post('cart/count', [OrderController::class, 'count']);
+
+    //order
+    
 }); 
 
 

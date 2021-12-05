@@ -7,13 +7,15 @@ use App\Models\Product;
 use App\Models\Product_photo;
 use App\Models\Product_variant;
 use App\Models\Price_grade_product;
+use App\Models\Voucher;
+use Carbon\Carbon;
 
 class Cart {
-    public static function count($cart, $buyer_type_id)
+    public static $total = 0;
+    public static $total_items = 0;
+    public static $items = null;
+    public static function count($cart, $buyer_type_id, $request)
     {
-        $grand_total = 0;
-        $total_items = 0;
-        $items;
         if (is_array($cart) || is_object($cart)){
             foreach($cart as $item){
                 // $items[] = Cart::price_grade_variant($item, $buyer_type_id)->selling_price;
@@ -23,32 +25,66 @@ class Cart {
                     if($price_grade_all_variant['price_grade_product'] == null){
                         $product_detail = Cart::product_detail($item);
                         if($product_detail['product'] == null || $product_detail['product_variant'] == null){
-                            $items[] = array(
+                            self::$items[] = array(
                                 'status' => false,
                                 'item_id' => $item->product_id,
                                 'item_variant_id' => $item->product_variant_id
                             );
                         }else{
-                            $grand_total = $grand_total + ($product_detail['product_variant']->selling_price*$item->qty);
-                            $total_items = $total_items + $item->qty;
-                            $items[] = Cart::product('product', $product_detail, $item->qty);
+                            self::$total = self::$total + ($product_detail['product_variant']->selling_price*$item->qty);
+                            self::$total_items = self::$total_items + $item->qty;
+                            self::$items[] = Cart::product('product', $product_detail, $item->qty);
                         }
                     }else{
                         // return $price_grade_all_variant;
-                        $grand_total = $grand_total + ($price_grade_all_variant['price_grade_product']->selling_price*$item->qty);
-                        $total_items = $total_items + $item->qty;
-                        $items[] = Cart::product('price_grade_all_variant', $price_grade_all_variant, $item->qty);
+                        self::$total = self::$total + ($price_grade_all_variant['price_grade_product']->selling_price*$item->qty);
+                        self::$total_items = self::$total_items + $item->qty;
+                        self::$items[] = Cart::product('price_grade_all_variant', $price_grade_all_variant, $item->qty);
                     }
                 }else{
-                    $grand_total = $grand_total + ($price_grade_variant->selling_price*$item->qty);
-                    $total_items = $total_items + $item->qty;
-                    $items[] = Cart::product('price_grade_variant', $price_grade_variant, $item->qty);
+                    self::$total = self::$total + ($price_grade_variant->selling_price*$item->qty);
+                    self::$total_items = self::$total_items + $item->qty;
+                    self::$items[] = Cart::product('price_grade_variant', $price_grade_variant, $item->qty);
                 }
             }
-            return array('cart'=>$items, 'grand_total'=>$grand_total, 'total_items'=>$total_items);
+            if(isset($request->voucher_code)){
+                return Cart::accumulation_voucher($request);
+            }else if(isset($request->discount_value)){
+                return Cart::discount_custom($request);
+            }else{
+                return array('cart'=>self::$items, 'grand_total'=>self::$total, 'total_items'=>self::$total_items);
+            }
         }else{
             return "non-object";
         }
+    }
+    public static function accumulation_voucher($request)
+    {
+        $voucher = Voucher::where('voucher_code', $request->voucher_code)
+        ->whereDate('valid_start_at', '<=', Carbon::now())
+        ->whereDate('valid_end_at', '>=', Carbon::now())
+        ->first();
+
+        if($voucher != null){
+            $discount = 0;
+            $grand_total = self::$total;
+            if($voucher->type == 1){
+                $discount = $voucher->value;
+                $grand_total = self::$total - $discount;
+            }else if($voucher->type == 2){
+                $discount = self::$total * $voucher->value / 100;
+                $grand_total = self::$total - $discount;
+            }
+            return array('voucher_code'=>$voucher->voucher_code, 'discount'=>'-'.$discount, 'cart'=>self::$items, 'grand_total'=>$grand_total, 'total_items'=>self::$total_items);
+        }else{
+            return array('cart'=>self::$items, 'grand_total'=>self::$total, 'total_items'=>self::$total_items);
+        }
+    }
+    public static function discount_custom($request)
+    {
+        $discount = $request->discount_value;
+        $grand_total = self::$total - $discount;
+        return array('discount'=>'-'.$discount, 'cart'=>self::$items, 'grand_total'=>$grand_total, 'total_items'=>self::$total_items);
     }
     public static function product_detail($item)
     {

@@ -11,6 +11,8 @@ use App\Util\Log;
 use App\Order\Cart;
 
 use App\Models\Shop_user;
+use App\Models\Voucher;
+use Carbon\Carbon;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -35,12 +37,15 @@ class OrderController extends Controller
     public function count(Request $request)
     {
         $user = Auth::user();
-        $check = Checker::valid($request, array('cart'=>'required', 'buyer_type_id' => 'required'));
+        $check = Checker::valid($request, array(
+            'cart'=>'required', 
+            'buyer_type_id' => 'required'
+        ));
         $shop = Shop_user::with('shop')->where('user_id', $user->id)->get();
         if($check==null){
             $cart = json_decode($request->cart)->cart;
             $buyer_type_id = $request->buyer_type_id;
-            return Cart::count($cart, $buyer_type_id);
+            return Cart::count($cart, $buyer_type_id, $request);
         }else{
             return response()->json(ResponseJson::response($check), 401);
         }
